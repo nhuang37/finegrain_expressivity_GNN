@@ -15,14 +15,11 @@
 | Untrained | 4.290 | 0.87 (0.11)
 
 
----
 
 | PROTEINS | #params (K) |Accuracy ($\pm$ std) 
 | --- | --- | --- |
 | Trained | 16.898 | 0.72 (0.04)
 | Untrained | 4.290 | 0.70 (0.03)
-
----
 
 
 
@@ -30,3 +27,8 @@
 | --- | --- | --- |
 | Trained | 16.898 | 0.70 (0.05)
 | Untrained | 4.290 | 0.69 (0.03)
+
+---
+To-dos:
+1) vary the number of layers in untrained MPNN (i.e., the number of WL iteration)
+2) stack $k$ number of untrained MPNN embedding together for graph classification
