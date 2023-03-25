@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch.nn import Linear, Sequential, ReLU, BatchNorm1d as BN
-from torch_geometric.nn import GINConv, GraphConv, GCNConv, GCNConv, global_add_pool
+from torch_geometric.nn import GINConv, GraphConv, GCNConv, global_add_pool
 from torch_geometric.nn import MessagePassing
 from torch_geometric.nn.inits import reset
 
@@ -50,7 +50,6 @@ class GIN(torch.nn.Module):
                 for param in conv.parameters():
                     param.requires_grad = False
 
-
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
         x = self.conv1(x, edge_index)
@@ -66,7 +65,6 @@ class GIN(torch.nn.Module):
 
     def __repr__(self):
         return self.__class__.__name__
-
 
 
 class GINEConv(MessagePassing):
@@ -98,7 +96,7 @@ class GINEConv(MessagePassing):
 
 
 class GINE(torch.nn.Module):
-    def __init__(self, dataset, num_layers, hidden):
+    def __init__(self, dataset, num_layers, hidden, untrain):
         super(GINE, self).__init__()
         self.conv1 = GINEConv(dataset.num_edge_features, dataset.num_features, hidden)
         self.convs = torch.nn.ModuleList()
@@ -107,12 +105,22 @@ class GINE(torch.nn.Module):
         self.lin1 = Linear(hidden, hidden)
         self.lin2 = Linear(hidden, dataset.num_classes)
 
+        self.untrain = untrain
+
     def reset_parameters(self):
         self.conv1.reset_parameters()
         for conv in self.convs:
             conv.reset_parameters()
         self.lin1.reset_parameters()
         self.lin2.reset_parameters()
+
+        if self.untrain:
+            for param in self.conv1.parameters():
+                param.requires_grad = False
+
+            for conv in self.convs:
+                for param in conv.parameters():
+                    param.requires_grad = False
 
     def forward(self, data):
         x, edge_index, batch, edge_attr = data.x, data.edge_index, data.batch, data.edge_attr
@@ -130,7 +138,7 @@ class GINE(torch.nn.Module):
 
 
 class GC(torch.nn.Module):
-    def __init__(self, dataset, num_layers, hidden):
+    def __init__(self, dataset, num_layers, hidden, untrain):
         super(GC, self).__init__()
         self.conv1 = GraphConv(dataset.num_features, hidden)
         self.convs = torch.nn.ModuleList()
@@ -139,12 +147,22 @@ class GC(torch.nn.Module):
         self.lin1 = Linear(hidden, hidden)
         self.lin2 = Linear(hidden, dataset.num_classes)
 
+        self.untrain = untrain
+
     def reset_parameters(self):
         self.conv1.reset_parameters()
         for conv in self.convs:
             conv.reset_parameters()
         self.lin1.reset_parameters()
         self.lin2.reset_parameters()
+
+        if self.untrain:
+            for param in self.conv1.parameters():
+                param.requires_grad = False
+
+            for conv in self.convs:
+                for param in conv.parameters():
+                    param.requires_grad = False
 
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
@@ -164,7 +182,7 @@ class GC(torch.nn.Module):
 
 
 class GCN(torch.nn.Module):
-    def __init__(self, dataset, num_layers, hidden):
+    def __init__(self, dataset, num_layers, hidden, untrain):
         super(GCN, self).__init__()
         self.conv1 = GCNConv(dataset.num_features, hidden)
         self.convs = torch.nn.ModuleList()
@@ -173,6 +191,8 @@ class GCN(torch.nn.Module):
         self.lin1 = Linear(hidden, hidden)
         self.lin2 = Linear(hidden, dataset.num_classes)
 
+        self.untrain = untrain
+
     def reset_parameters(self):
         self.conv1.reset_parameters()
         for conv in self.convs:
@@ -180,7 +200,13 @@ class GCN(torch.nn.Module):
         self.lin1.reset_parameters()
         self.lin2.reset_parameters()
 
+        if self.untrain:
+            for param in self.conv1.parameters():
+                param.requires_grad = False
 
+            for conv in self.convs:
+                for param in conv.parameters():
+                    param.requires_grad = False
 
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
