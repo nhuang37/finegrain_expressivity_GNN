@@ -8,7 +8,7 @@ from torch_geometric.nn.inits import reset
 
 # Taken from https://github.com/rusty1s/pytorch_geometric/blob/master/benchmark/kernel/gin.py.
 class GIN(torch.nn.Module):
-    def __init__(self, dataset, num_layers, hidden):
+    def __init__(self, dataset, num_layers, hidden, untrain):
         super(GIN, self).__init__()
         self.conv1 = GINConv(Sequential(
             Linear(dataset.num_features, hidden),
@@ -18,6 +18,9 @@ class GIN(torch.nn.Module):
             BN(hidden),
         ),
             train_eps=True)
+
+        self.untrain = untrain
+
         self.convs = torch.nn.ModuleList()
         for i in range(num_layers - 1):
             self.convs.append(
@@ -38,6 +41,15 @@ class GIN(torch.nn.Module):
             conv.reset_parameters()
         self.lin1.reset_parameters()
         self.lin2.reset_parameters()
+
+        if self.untrain:
+            for param in self.conv1.parameters():
+                param.requires_grad = False
+
+            for conv in self.convs:
+                for param in conv.parameters():
+                    param.requires_grad = False
+
 
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
@@ -167,6 +179,8 @@ class GCN(torch.nn.Module):
             conv.reset_parameters()
         self.lin1.reset_parameters()
         self.lin2.reset_parameters()
+
+
 
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
