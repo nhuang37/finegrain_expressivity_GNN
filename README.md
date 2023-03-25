@@ -30,5 +30,5 @@
 
 ---
 To-dos:
-1) vary the number of layers in untrained MPNN (i.e., the number of WL iteration)
-2) stack $k$ number of untrained MPNN embedding together for graph classification
+1) vary the number of layers (i.e., the number of WL iteration)
+2) vary the number of hidden_dimension (i.e., the number of functions)
