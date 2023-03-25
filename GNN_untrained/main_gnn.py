@@ -30,7 +30,6 @@ def main():
 
 
 
-
     for r in results:
         print(r)
 
