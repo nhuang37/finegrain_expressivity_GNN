@@ -143,7 +143,7 @@ class GC(torch.nn.Module):
         self.conv1 = GraphConv(dataset.num_features, hidden)
         self.convs = torch.nn.ModuleList()
         for i in range(num_layers - 1):
-            self.convs.append(GraphConv(dataset.num_features, hidden))
+            self.convs.append(GraphConv(hidden, hidden))
         self.lin1 = Linear(hidden, hidden)
         self.lin2 = Linear(hidden, dataset.num_classes)
 
@@ -168,9 +168,6 @@ class GC(torch.nn.Module):
         x, edge_index, batch = data.x, data.edge_index, data.batch
         x = self.conv1(x, edge_index)
 
-        print(x.size())
-        exit()
-
         for conv in self.convs:
             x = conv(x, edge_index)
 
@@ -191,7 +188,7 @@ class GCN(torch.nn.Module):
         self.conv1 = GCNConv(dataset.num_features, hidden)
         self.convs = torch.nn.ModuleList()
         for i in range(num_layers - 1):
-            self.convs.append(GCNConv(dataset.num_features, hidden))
+            self.convs.append(GCNConv(hidden, hidden))
         self.lin1 = Linear(hidden, hidden)
         self.lin2 = Linear(hidden, dataset.num_classes)
 
