@@ -52,6 +52,8 @@ def test(loader, model, device):
 # 10-CV for GNN training and hyperparameter selection.
 def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=128, start_lr=0.01, min_lr = 0.000001, factor=0.5, patience=5,
                        num_repetitions=10, all_std=True, untrain=False):
+    #reproducibility
+    torch.manual_seed(0)
     # Load dataset and shuffle.
     path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'datasets', ds_name)
     dataset = TUDataset(path, name=ds_name).shuffle()
@@ -81,8 +83,8 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
     for i in range(num_repetitions):
         # Test acc. over all folds.
         test_accuracies = []
-        kf = KFold(n_splits=10, shuffle=True)
-        dataset.shuffle()
+        kf = KFold(n_splits=10, shuffle=True, random_state=i)
+        #dataset.shuffle()
 
         for train_index, test_index in kf.split(list(range(len(dataset)))):
             # Sample 10% split from training split for validation.
@@ -98,7 +100,7 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
             # Prepare batching.
             train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
             val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
-            test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+            test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False) #reproducible
 
             # Collect val. and test acc. over all hyperparameter combinations.
             for l in layers:
