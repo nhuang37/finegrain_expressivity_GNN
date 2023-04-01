@@ -50,6 +50,8 @@ class NetGINE(torch.nn.Module):
         num_features = 3
         dim = dim
 
+        self.untrain = untrain
+
 
         self.conv1 = GINConv(num_features, 28, 256)
         self.bn1 = torch.nn.BatchNorm1d(dim)
