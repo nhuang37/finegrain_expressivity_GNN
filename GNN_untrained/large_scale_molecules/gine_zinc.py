@@ -38,7 +38,7 @@ class GINConv(MessagePassing):
         return aggr_out
 
     def reset_parameters(self):
-        reset(self.edge_encoder)
+        reset(self.bond_encoder)
         reset(self.mlp)
         self.eps.data.fill_(self.initial_eps)
 
