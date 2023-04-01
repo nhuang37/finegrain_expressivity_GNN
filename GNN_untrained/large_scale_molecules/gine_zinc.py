@@ -7,7 +7,7 @@ import os.path as osp
 import numpy as np
 import torch
 from torch.nn import Sequential, Linear, ReLU
-from torch_geometric.nn import global_mean_pool, GINConv, MessagePassing
+from torch_geometric.nn import global_mean_pool, MessagePassing
 from torch_geometric.datasets import TUDataset
 
 from torch_geometric.data import DataLoader
