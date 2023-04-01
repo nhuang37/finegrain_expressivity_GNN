@@ -14,6 +14,7 @@ from torch_geometric.data import DataLoader
 import torch
 from torch_geometric.nn import MessagePassing
 import torch.nn.functional as F
+from torch_geometric.nn.inits import reset
 
 
 class GINConv(MessagePassing):
@@ -24,6 +25,7 @@ class GINConv(MessagePassing):
         self.mlp = Sequential(Linear(dim1, dim1), ReLU(), Linear(dim1, dim2))
 
         self.eps = torch.nn.Parameter(torch.Tensor([0]))
+        self.initial_eps = 0
 
     def forward(self, x, edge_index, edge_attr):
         edge_embedding = self.bond_encoder(edge_attr)
@@ -37,6 +39,11 @@ class GINConv(MessagePassing):
 
     def update(self, aggr_out):
         return aggr_out
+
+    def reset_parameters(self):
+        reset(self.bond_encoder)
+        reset(self.mlp)
+        self.eps.data.fill_(self.initial_eps)
 
 
 class NetGINE(torch.nn.Module):
