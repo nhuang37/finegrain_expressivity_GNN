@@ -43,7 +43,6 @@ class NetGINE(torch.nn.Module):
         num_features = 3
         dim = dim
 
-        self.untrain = untrain
 
         self.conv1 = GINConv(num_features, 28, 256)
         self.bn1 = torch.nn.BatchNorm1d(dim)
@@ -122,14 +121,13 @@ for _ in range(5):
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
-    model = NetGINE(256, untrain=True).to(device)
+    model = NetGINE(256, untrain=False).to(device)
     model.reset_parameters()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min',
                                                            factor=0.5, patience=5,
                                                            min_lr=0.0000001)
-
 
     def train():
         model.train()
