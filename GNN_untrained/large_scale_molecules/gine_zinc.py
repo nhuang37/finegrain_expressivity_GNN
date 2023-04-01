@@ -74,8 +74,10 @@ class NetGINE(torch.nn.Module):
         self.conv3.reset_parameters()
         self.conv4.reset_parameters()
 
-        self.lin1.reset_parameters()
-        self.lin2.reset_parameters()
+        self.fc1.reset_parameters()
+        self.fc2.reset_parameters()
+        self.fc3.reset_parameters()
+        self.fc4.reset_parameters()
 
         if self.untrain:
             for param in self.conv1.parameters():
