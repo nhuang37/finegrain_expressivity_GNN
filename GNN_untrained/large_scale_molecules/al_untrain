@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH --job-name=al
+#SBATCH --output=al_untrain.txt
+#SBATCH --error=al_untrain.txt
+#SBATCH --ntasks=1
+#SBATCH --time=48:00:00
+#SBATCH --mem=128G
+#SBATCH --gres=gpu:1
+#SBATCH -c 8
+#SBATCH --partition=gpu_80gb
+export PYTHONUNBUFFERED=1
+source ../../.bashrc
+conda activate gc
+python gine_alchemy.py
