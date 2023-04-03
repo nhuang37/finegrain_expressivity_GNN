@@ -90,7 +90,7 @@ for _ in range(5):
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
-    model = NetGINE(256, untrain=False).to(device)
+    model = NetGINE(256, untrain=True).to(device)
     model.reset_parameters()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
