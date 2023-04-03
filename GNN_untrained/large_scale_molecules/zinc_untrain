@@ -11,4 +11,4 @@
 export PYTHONUNBUFFERED=1
 source ../../.bashrc
 conda activate gc
-python gine_zinc.py
+python gc_zinc.py
