@@ -58,21 +58,24 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
     path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'datasets', ds_name)
     dataset = TUDataset(path, name=ds_name).shuffle()
 
-    # One-hot degree if node labels are not available.
-    # The following if clause is taken from  https://github.com/rusty1s/pytorch_geometric/blob/master/benchmark/kernel/datasets.py.
+    # Constant node features if node features are not available
     if dataset.data.x is None:
-        max_degree = 0
-        degs = []
-        for data in dataset:
-            degs += [degree(data.edge_index[0], dtype=torch.long)]
-            max_degree = max(max_degree, degs[-1].max().item())
+        dataset.transform = T.Constant(value=1)
+        
+# One-hot degree if node labels are not available.
+# The following if clause is taken from  https://github.com/rusty1s/pytorch_geometric/blob/master/benchmark/kernel/datasets.py.
+#         max_degree = 0
+#         degs = []
+#         for data in dataset:
+#             degs += [degree(data.edge_index[0], dtype=torch.long)]
+#             max_degree = max(max_degree, degs[-1].max().item())
 
-        if max_degree < 1000:
-            dataset.transform = T.OneHotDegree(max_degree)
-        else:
-            deg = torch.cat(degs, dim=0).to(torch.float)
-            mean, std = deg.mean().item(), deg.std().item()
-            dataset.transform = NormalizedDegree(mean, std)
+#         if max_degree < 1000:
+#             dataset.transform = T.OneHotDegree(max_degree)
+#         else:
+#             deg = torch.cat(degs, dim=0).to(torch.float)
+#             mean, std = deg.mean().item(), deg.std().item()
+#             dataset.transform = NormalizedDegree(mean, std)
 
     # Set device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
