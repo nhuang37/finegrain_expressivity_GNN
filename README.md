@@ -12,6 +12,7 @@ Source code for paper "Fine-grained Expressivity of Graph Neural Networks" that 
 
 ## Q1: 
 - ```distance_preservation/Finegrain_MPNN_evaluation.ipynb```: experiments comparing graph distance using our metrics and MPNN embedding distances, using simulated SBM graphs and real-world benchmark graphs from TUDataset
+- ```distance_preservation/distance.py```: code to compute Prokhorov distance/Wasserstein distance using our metrics on Iterated Degree Measures
 
 ## Q2:
 - ```GNN_untrained/```: experiments demonstrate the surprising effectiveness of untrained MPNNs compared to their trained counterparts
