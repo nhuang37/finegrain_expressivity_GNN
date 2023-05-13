@@ -328,10 +328,12 @@ def computeDistance(G, H, metric = wassersteinMinCostFlow, iterationBound = math
             for j in range(i + 1, numNewColors):
                 if ((newColorOccursInG[i] and not newColorOccursInH[i]) and (newColorOccursInG[j] and not newColorOccursInH[j])):
                     # Both colors only occur in G, we do not need this distance
-                    d = 1
+                    # Let us set it to the maximum value, i.e., one
+                    d = distDenom
                 elif ((not newColorOccursInG[i] and newColorOccursInH[i]) and (not newColorOccursInG[j] and newColorOccursInH[j])):
                     # Both colors only occur in H, we do not need this distance
-                    d = 1
+                    # Let us set it to the maximum value, i.e., one
+                    d = distDenom
                 else:
                     d = metric(newColors[i], newColors[j], distMatrix, measDenom, distDenom)
 
