@@ -1,5 +1,7 @@
 # Fine-grained Expressivity of Graph Neural Networks
 
+[![arXiv](https://img.shields.io/badge/arXiv-2306.03698-b31b1b.svg)](https://arxiv.org/abs/2306.03698)
+
 Source code for paper "Fine-grained Expressivity of Graph Neural Networks" that answers the following research questions:
 - Q1: (distance_preservation) To what extent do our graph metrics act as a proxy for distances between MPNN's learned vectorial representations?
 - Q2: (GNN_untrained) How do untrained MPNNs compared to their trained counterparts in terms of predictive performance?
