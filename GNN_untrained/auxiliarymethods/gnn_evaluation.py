@@ -1,5 +1,5 @@
 import os.path as osp
-
+import time
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -58,24 +58,21 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
     path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'datasets', ds_name)
     dataset = TUDataset(path, name=ds_name).shuffle()
 
-    # Constant node features if node features are not available
+    # Constant node features
     if dataset.data.x is None:
         dataset.transform = T.Constant(value=1)
-        
-# One-hot degree if node labels are not available.
-# The following if clause is taken from  https://github.com/rusty1s/pytorch_geometric/blob/master/benchmark/kernel/datasets.py.
-#         max_degree = 0
-#         degs = []
-#         for data in dataset:
-#             degs += [degree(data.edge_index[0], dtype=torch.long)]
-#             max_degree = max(max_degree, degs[-1].max().item())
+        # max_degree = 0
+        # degs = []
+        # for data in dataset:
+        #     degs += [degree(data.edge_index[0], dtype=torch.long)]
+        #     max_degree = max(max_degree, degs[-1].max().item())
 
-#         if max_degree < 1000:
-#             dataset.transform = T.OneHotDegree(max_degree)
-#         else:
-#             deg = torch.cat(degs, dim=0).to(torch.float)
-#             mean, std = deg.mean().item(), deg.std().item()
-#             dataset.transform = NormalizedDegree(mean, std)
+        # if max_degree < 1000:
+        #     dataset.transform = T.OneHotDegree(max_degree)
+        # else:
+        #     deg = torch.cat(degs, dim=0).to(torch.float)
+        #     mean, std = deg.mean().item(), deg.std().item()
+        #     dataset.transform = NormalizedDegree(mean, std)
 
     # Set device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -116,9 +113,18 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
                     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min',
                                                                            factor=factor, patience=patience,
                                                                            min_lr=0.0000001)
+                    times = []
                     for epoch in range(1, max_num_epochs + 1):
                         lr = scheduler.optimizer.param_groups[0]['lr']
+                        #count training time per epoch
+                        torch.cuda.synchronize() 
+                        start_time = time.time()
                         train(train_loader, model, optimizer, device)
+                        torch.cuda.synchronize()
+                        end_time = time.time()
+                        elapsed = end_time - start_time
+                        times.append(elapsed)
+
                         val_acc = test(val_loader, model, device)
                         scheduler.step(val_acc)
 
@@ -129,6 +135,7 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
                         # Break if learning rate is smaller 10**-6.
                         if lr < min_lr:
                             break
+                    
 
             test_accuracies.append(best_test)
 
@@ -138,6 +145,7 @@ def gnn_evaluation(gnn, ds_name, layers, hidden, max_num_epochs=200, batch_size=
 
     if all_std:
         return (np.array(test_accuracies_all).mean(), np.array(test_accuracies_all).std(),
-                np.array(test_accuracies_complete).std())
+                np.array(test_accuracies_complete).std(), np.array(times).mean(), np.array(times).std())
     else:
-        return (np.array(test_accuracies_all).mean(), np.array(test_accuracies_all).std())
+        return (np.array(test_accuracies_all).mean(),  np.array(times).mean(), np.array(times).std())
+
